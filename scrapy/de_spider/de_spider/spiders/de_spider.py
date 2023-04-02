@@ -9,18 +9,15 @@ class DataExtractionSpider(scrapy.Spider):
     start_urls = ["https://www.bproperty.com/en/bangladesh/properties-for-sale/"]
     website_main_url = "https://www.bproperty.com/"
     header = "'Type', 'Location', 'Price', 'Area', 'Bed Rooms', 'Bath Rooms'"
+    with open(filename, 'a+') as f:
+        f.write(header + "\n")
 
     def parse(self, response):
 
-        listed_items = response.css("li article div a._287661cb::attr(href)")
-        urls = []
+        urls = response.css("li article div a._287661cb::attr(href)").getall()
 
-        for item in listed_items :
-            context_name = item.get()
-            urls.append(f"{self.website_main_url}{context_name}")
+        urls = [ self.website_main_url+context_name for context_name in urls]
 
-        with open(filename, 'a+') as f:
-             f.write(self.header + "\n")
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse_details_page)
 
@@ -34,6 +31,8 @@ class DataExtractionSpider(scrapy.Spider):
         building_type = response.css("span._812aa185::text").get()
 
         info = f"{building_type}, {location}, {price}, {area}, {num_bed_rooms}, {num_bath_rooms}"
+        #yield  { "type":building_type,"location": location, "price":price, "area": area,"num_bed_rooms": num_bed_rooms, "num_bath_rooms":num_bath_rooms}
+
 
         with open(filename, 'a+') as f:
-             f.write(info + "\n")
+            f.write(info + "\n")
