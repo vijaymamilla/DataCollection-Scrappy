@@ -6,7 +6,8 @@ from twisted.internet.error import TimeoutError, TCPTimedOutError
 
 class DataExtractionSpider(scrapy.Spider):
     name = "de_spider"
-    start_urls = ["https://www.bproperty.com/en/bangladesh/properties-for-sale/"]
+    start_urls = ["https://www.bproperty.com/en/bangladesh/properties-for-sale/",
+                  "https://www.bproperty.com/en/bangladesh/properties-for-rent/"]
     website_main_url = "https://www.bproperty.com/"
 
     #
@@ -35,9 +36,10 @@ class DataExtractionSpider(scrapy.Spider):
         item['location'] = response.css("div._1f0f1758::text").get()
         item['num_bed_rooms'] = response.css("span.fc2d1086::text").get()
         item['num_bath_rooms'] = response.css("span.fc2d1086::text").get()
-        item['area'] = response.css("span.fc2d1086::text").get()
-        item['building_type'] = response.css("span._812aa185::text").get()
-
+        item['area'] = response.css("span.fc2d1086 span::text").get()
+        item['building_type'] = response.css("ul._033281ab li span._812aa185::text").get()
+        item['purpose'] = response.xpath('//span[contains(@aria-label, "Purpose")]/text()').get()
+        item['amenities'] = '##'.join(response.css('div._40544a2f span._005a682a::text').getall())
         yield item
 
     def errback_httpbin(self, failure):

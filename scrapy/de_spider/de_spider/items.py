@@ -9,3 +9,5 @@ class DeSpiderItem(Item):
     num_bath_rooms = Field()
     area = Field()
     building_type = Field()
+    purpose = Field()
+    amenities = Field()
