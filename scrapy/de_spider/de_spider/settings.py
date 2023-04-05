@@ -12,7 +12,11 @@ BOT_NAME = "de_spider"
 SPIDER_MODULES = ["de_spider.spiders"]
 NEWSPIDER_MODULE = "de_spider.spiders"
 
-
+FEEDS = {
+    'output/%(name)s/%(name)s_%(time)s.csv': {
+        'format': 'csv',
+        }
+}
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "de_spider (+http://www.yourdomain.com)"
 
