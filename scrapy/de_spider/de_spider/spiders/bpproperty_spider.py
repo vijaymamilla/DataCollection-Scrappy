@@ -20,9 +20,9 @@ class BpPropertySpider(scrapy.Spider):
         url_context_names = response.css("li article div a._287661cb::attr(href)").getall()
 
         current_url_list = [self.website_main_url + context_name for context_name in url_context_names]
-
+        commercial_type = "commercial" in response.url
         for url in current_url_list:
-            yield scrapy.Request(url=url, callback=self.parse_details_page, errback=self.errback_httpbin)
+            yield scrapy.Request(url=url, callback=self.parse_details_page,meta={"commercial_type":commercial_type}, errback=self.errback_httpbin)
 
         next_page = response.xpath('//div/ul/li/a[contains(@title, "Next")]').xpath('@href').get()
 
@@ -35,7 +35,10 @@ class BpPropertySpider(scrapy.Spider):
     def parse_details_page(self, response):
 
         item = BpPropertyItem()
+        item['commercial_type'] = response.request.meta['commercial_type']
         item['property_url'] = response.request.url
+        item['property_description'] = response.css("div.daabbebb div div._208d68ae h1.fcca24e0::text").get()
+        item['property_overview'] = response.xpath('string(//span[@class="_2a806e1e"])').get()
         item['price'] = response.css("span._105b8a67::text").get()
         item['location'] = response.css("div._1f0f1758::text").get()
         item['num_bed_rooms'] = response.css("span.fc2d1086::text").get()
