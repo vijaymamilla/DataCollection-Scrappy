@@ -21,6 +21,7 @@ class BpPropertySpider(scrapy.Spider):
 
         current_url_list = [self.website_main_url + context_name for context_name in url_context_names]
         commercial_type = "commercial" in response.url
+
         for url in current_url_list:
             yield scrapy.Request(url=url, callback=self.parse_details_page,meta={"commercial_type":commercial_type}, errback=self.errback_httpbin)
 
@@ -46,6 +47,7 @@ class BpPropertySpider(scrapy.Spider):
         item['area'] = response.css("span.fc2d1086 span::text").get()
         item['building_type'] = response.css("ul._033281ab li span._812aa185::text").get()
         item['purpose'] = response.xpath('//span[contains(@aria-label, "Purpose")]/text()').get()
+        item['image_url'] = response.css('div.f4b939fe picture._219b7e0a img.bea951ad').xpath('@src').get()
         amenities = '##'.join(response.css('div._40544a2f span._005a682a::text').getall())
 
         if amenities is None or len(amenities.strip()) == 0:
